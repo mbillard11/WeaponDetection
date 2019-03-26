@@ -17,6 +17,7 @@ model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet.h5')
 video = cv2.VideoCapture('/home/mitchell/Desktop/WeaponDetection/pistol.mp4')
 
 while True:
+        # Maybe check every 5th frame
         _, frame = video.read()
 
         #Convert the captured frame into RGB
@@ -27,7 +28,7 @@ while True:
         img_array = np.array(im)
 
         #Our keras model used a 4D tensor, (images x height x width x channel)
-        #So changing dimension 128x128x3 into 1x128x128x3 
+        #So changing dimension 150x150x3 into 1x150x150x3 
         img_array = np.expand_dims(img_array, axis=0)
 
         #Calling the predict method on model to predict gun on the image
@@ -35,7 +36,7 @@ while True:
         print(prediction)
 
         #if prediction is 0, which means the gun is missing on the image, then show the frame in gray color.
-        if prediction <= 0.8:
+        if prediction <= 0.9:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         cv2.imshow("Capturing", frame)

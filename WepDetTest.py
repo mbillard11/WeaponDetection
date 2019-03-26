@@ -1,4 +1,4 @@
-e# Ignore  the warnings
+# Ignore  the warnings
 import warnings
 warnings.filterwarnings('always')
 warnings.filterwarnings('ignore')
@@ -22,13 +22,13 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils import to_categorical
 
 
-model = models.load_model('/home/mitchell/Desktop/4301Project/WepDet.h5')
+model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet.h5')
 
 X=[]
 Z=[]
 IMG_SIZE=150
-DATA_GUN_DIR='/home/mitchell/Desktop/4301Project/dataset/test_set/gun'
-DATA_NONGUN_DIR='/home/mitchell/Desktop/4301Project/dataset/test_set/nogun'
+DATA_GUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/test_set/gun'
+DATA_NONGUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/test_set/nogun'
 
 def assign_label(img,img_type):
     return img_type
@@ -50,40 +50,47 @@ print(len(X))
 make_test_data('nogun',DATA_NONGUN_DIR)
 print(len(X))
 
-fig,ax=plt.subplots(5,2)
-fig.set_size_inches(15,15)
-for i in range(5):
-    for j in range (2):
-        l=rn.randint(0,len(Z))
-        # Had index oob error here once
-        ax[i,j].imshow(X[l])
-        ax[i,j].set_title('Gun: '+Z[l])
+#fig,ax=plt.subplots(5,2)
+#fig.set_size_inches(15,15)
+#for i in range(5):
+#    for j in range (2):
+#        l=rn.randint(0,len(Z))
+#        # Had index oob error here once
+#        ax[i,j].imshow(X[l])
+#        ax[i,j].set_title('Gun: '+Z[l])
         
 plt.tight_layout()
 
 le=LabelEncoder()
 Y=le.fit_transform(Z)
-Y=to_categorical(Y,5)
+Y=to_categorical(Y,2)
 X=np.array(X)
 X=X/255
 
+evaluation = model.evaluate(X,Y)
+print('Loss: ',evaluation[0])
+print('Accuracy: ',evaluation[1])
+for layer in model.layers:
+    print(layer.input_shape)
 
-x_train,x_test,y_train,y_test=train_test_split(X,Y,test_size=0.25,random_state=42)
+#x_train,x_test,y_train,y_test=train_test_split(X,Y,test_size=0.25,random_state=42)
 
 
 # getting predictions on val set.
-pred=model.predict(x_test)
-pred_digits=np.argmax(pred,axis=1)
+#pred=model.predict(x_test)
+#pred_digits=np.argmax(pred,axis=1)
 
 # now storing some properly as well as misclassified indexes'.
-i=0
-prop_class=[]
-mis_class=[]
-
-for i in range(len(y_test)):
-    if(np.argmax(y_test[i])==pred_digits[i]):
-        prop_class.append(i)
-    if(len(prop_class)==8):
-        break
+#i=0
+#prop_class=[]
+#mis_class=[]
+#
+#for i in range(len(y_test)):
+#    if(np.argmax(y_test[i])==pred_digits[i]):
+#        prop_class.append(i)
+#    else:
+#        mis_class.append(i)
+#    if(len(prop_class)==8 or len(mis_class) == 8):
+#        break
 
 
