@@ -22,7 +22,7 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils import to_categorical
 
 
-model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet.h5')
+model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet_26_50.h5')
 
 X=[]
 Z=[]
@@ -70,8 +70,9 @@ X=X/255
 evaluation = model.evaluate(X,Y)
 print('Loss: ',evaluation[0])
 print('Accuracy: ',evaluation[1])
-for layer in model.layers:
-    print(layer.input_shape)
+#for layer in model.layers:
+#    print(layer.input_shape)
+#print(model.summary())
 
 #x_train,x_test,y_train,y_test=train_test_split(X,Y,test_size=0.25,random_state=42)
 

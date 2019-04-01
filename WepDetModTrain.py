@@ -2,7 +2,8 @@
 """
 Created on Sun Mar 10 20:44:23 2019
 
-@author: arshiyaahuja
+@authors: arshiyaahuja
+          Mitchell Billard
 """
 
 # Ignore  the warnings
@@ -36,7 +37,7 @@ from keras.preprocessing.image import ImageDataGenerator
 #dl libraraies
 from keras import backend as K
 from keras.models import Sequential, Model
-from keras.layers import Dense, GlobalAveragePooling2D
+from keras.layers import Dense, GlobalAveragePooling2D, LSTM
 from keras.optimizers import Adam,SGD,Adagrad,Adadelta,RMSprop
 from keras.utils import to_categorical
 
@@ -65,8 +66,8 @@ Z=[]
 IMG_SIZE=150
 # DATA_GUN_DIR='gun'
 # DATA_NONGUN_DIR='nogun'
-DATA_GUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/training_set/gun'
-DATA_NONGUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/training_set/nogun'
+DATA_GUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/training_videos/gun'
+DATA_NONGUN_DIR='/home/mitchell/Desktop/WeaponDetection/dataset/training_videos/nogun'
 
 def assign_label(img,img_type):
     return img_type
@@ -112,20 +113,23 @@ np.random.seed(42)
 rn.seed(42)
 tf.set_random_seed(42)
 
+#MobileNet
 base_model=MobileNet(weights='imagenet',include_top=False) #imports the mobilenet model and discards the last 1000 neuron layer.
 x=base_model.output
 x=GlobalAveragePooling2D()(x)
-x=Dense(50,activation='relu')(x) #we add dense layers so that the model can learn more complex functions and classify for better results.
-x=Dense(50,activation='relu')(x) #dense layer 2
-x=Dense(20,activation='relu')(x) #dense layer 3
-preds=Dense(2,activation='softmax')(x) #final layer with softmax activation
-
-model=Model(inputs=base_model.input,outputs=preds)
+#x=Dense(50,activation='relu')(x) #we add dense layers so that the model can learn more complex functions and classify for better results.
+#x=Dense(50,activation='relu')(x) #dense layer 2
+#x=Dense(20,activation='relu')(x) #dense layer 3
+preds=Dense(2,activation='softmax')(x) #final layer with softmax activation 
+ 
+model=Model(inputs=base_model.input,outputs=preds) 
 for layer in model.layers:
     layer.trainable=False
-for layer in model.layers[-6:]:
+for layer in model.layers[-1:]:
     layer.trainable=True
-print(model.summary())
+    
+
+#Normal CNN
 #model = Sequential()
 #model.add(Conv2D(filters = 32, kernel_size = (5,5),padding = 'Same',activation ='relu', input_shape = (150,150,3)))
 #model.add(MaxPooling2D(pool_size=(2,2)))
@@ -145,11 +149,11 @@ print(model.summary())
 ##model.add(layers.Dropout(0.5))  Dropout layer could be used for overfitting
 #model.add(Dense(512))
 #model.add(Activation('relu'))
-#model.add(Dense(5, activation = "softmax"))
+#model.add(Dense(2, activation = "softmax"))
 
 
-batch_size=128
-epochs=10
+batch_size=64
+epochs=3
 
 from keras.callbacks import ReduceLROnPlateau
 red_lr= ReduceLROnPlateau(monitor='val_acc',patience=3,verbose=1,factor=0.1)
@@ -174,7 +178,7 @@ datagen.fit(x_train)
 model.compile(optimizer=Adam(lr=0.001),loss='categorical_crossentropy',metrics=['accuracy'])
 
 
-#model.summary()
+model.summary()
 
 History = model.fit_generator(datagen.flow(x_train,y_train, batch_size=batch_size),
                               epochs = epochs, validation_data = (x_test,y_test),
@@ -182,7 +186,7 @@ History = model.fit_generator(datagen.flow(x_train,y_train, batch_size=batch_siz
 #model.fit(x_train,y_train,epochs=epochs,batch_size=batch_size,validation_data = (x_test,y_test))
 
 # Save the model
-model.save('WepDet.h5')
+model.save('WepDet_MobileNew4.h5')
 
 # Plot training redults
 plt.plot(History.history['loss'])
@@ -202,7 +206,7 @@ plt.legend(['train', 'test'])
 plt.show()
 
 # Load model
-model = tf.keras.models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet.h5')
+model = tf.keras.models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet_MobileNew4.h5')
 
 # getting predictions on val set.
 pred=model.predict(x_test)

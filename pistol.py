@@ -13,8 +13,9 @@ from keras import models
 #import matplotlib.pyplot as plt
 
 #Load the saved model
-model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet.h5')
-video = cv2.VideoCapture('/home/mitchell/Desktop/WeaponDetection/pistol.mp4')
+model = models.load_model('/home/mitchell/Desktop/WeaponDetection/WepDet_MobileNew2.h5')
+#video = cv2.VideoCapture('/home/mitchell/Desktop/WeaponDetection/dataset/test_video/test_gun.flv')
+video = cv2.VideoCapture(0)
 
 while True:
         # Maybe check every 5th frame
@@ -36,7 +37,7 @@ while True:
         print(prediction)
 
         #if prediction is 0, which means the gun is missing on the image, then show the frame in gray color.
-        if prediction <= 0.9:
+        if prediction <= 0.7:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         cv2.imshow("Capturing", frame)
